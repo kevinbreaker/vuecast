@@ -1,0 +1,24 @@
+<svg aria-hidden="true" data-prefix="fal" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg" height="65px" viewBox="0 0 256 512" class="svg-inline--fa fa-angle-down fa-w-8 fa-3x">
+  <style>
+    @keyframes blink {
+      from {
+        opacity: 0.4
+      }
+      to {
+        opacity: 1
+      }
+    }
+    path {
+      fill: #d7d7d7
+    }
+    .path-2 {
+      animation: blink .5s ease-in-out alternate infinite
+    }
+    .path-1 {
+      animation: blink .5s 0.2s ease-in-out alternate infinite
+    }
+  </style>
+   <path class="path path-1"
+     d="M 119.5,326.9 3.5,209.1 c -4.7,-4.7 -4.7,-12.3 0,-17 l 7.1,-7.1 c 4.7,-4.7 12.3,-4.7 17,0 L 128,287.3 228.4,185.1 c 4.7,-4.7 12.3,-4.7 17,0 l 7.1,7.1 c 4.7,4.7 4.7,12.3 0,17 L 136.5,327 c -4.7,4.6 -12.3,4.6 -17,-0.1 z"/>
+  <path class="path path-2" d="m 119.5,232.62791 -116,-117.8 c -4.7,-4.7 -4.7,-12.3 0,-16.999999 l 7.1,-7.1 c 4.7,-4.7 12.3,-4.7 17,0 L 128,193.02791 228.4,90.827911 c 4.7,-4.7 12.3,-4.7 17,0 l 7.1,7.1 c 4.7,4.699999 4.7,12.299999 0,16.999999 l -116,117.8 c -4.7,4.6 -12.3,4.6 -17,-0.1 z" />
+</svg>
