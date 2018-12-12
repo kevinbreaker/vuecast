@@ -7,26 +7,27 @@
         </div>
         <div class="mask"></div>
         <ul class="player-info info-one" style="text-align: left; padding-left: 10px">
-          <li><strong>VueCast</strong></li>
+          <li>
+            <strong>VueCast</strong>
+          </li>
           <li>{{title}}</li>
           <li>{{host}}</li>
-          <li>5:34</li>
+          <li>{{time}}</li>
         </ul>
-        <!-- <ul class="player-info info-two">
-          <li>Rock'n'Roll Nerd</li>
-          <li>Tim Minchin</li>
+        <ul class="player-info info-two" :class="played ? 'info-active' : ''">
+          <li>{{title}}</li>
+          <li>{{host}}</li>
           <li>
             <span id="duration"></span>
-            <i>/</i>5:34
           </li>
-        </ul> -->
-        <div id="play-button" class="unchecked" style="display: flex; align-items: center; justify-content: center">
+        </ul>
+        <div @click="play" id="play-button" :class="played ? 'play-inactive' : 'unchecked'" style="display: flex; align-items: center; justify-content: center">
           <img style="height: 50px" src="../assets/play.svg" alt srcset>
         </div>
         <div class="control-row">
           <div class="waves-animation-one"></div>
           <div class="waves-animation-two"></div>
-          <div id="pause-button">
+          <div id="pause-button" :class="played ? 'scale-animation-active' : ''">
             <img src="../assets/pause-circle.svg" alt>
           </div>
           <div class="seek-field">
@@ -51,18 +52,14 @@
               max="100"
               value="100"
               step="1"
-              oninput="audio.volume = this.value/100"
-              onchange="this.oninput()"
+              @change="volume"
             >
           </div>
         </div>
       </div>
     </div>
-    <audio id="audio-player" ontimeupdate="SeekBar()" ondurationchange="CreateSeekBar()" preload="auto" loop>
-      <source
-        src="../assets/episodes/003-arquitetura-e-estruturcao-de-projetos.mp3"
-        type="audio/mpeg"
-      >
+    <audio ref="player" id="audio-player" ontimeupdate="SeekBar()" ondurationchange="CreateSeekBar()" preload="auto" loop>
+      <source src="../assets/episodes/003-arquitetura-e-estruturcao-de-projetos.mp3" type="audio/mpeg">
     </audio>
   </div>
 </template>
@@ -178,6 +175,26 @@ export default {
     title: String,
     image: String,
     host: String
+  },
+  data: () => ({
+    played: false,
+    time: '00:00'
+  }),
+  mounted () {
+    this.$nextTick(() => {
+      console.log(this.$refs.player.duration, 'hehe')
+    })
+    // this.$refs.player.duration
+  },
+  methods: {
+    volume (value) {
+      console.log(value)
+      this.$refs.player.volume = value / 100
+    },
+    play () {
+      this.played = !this.played
+      // document.getElementById('audio-player').play()
+    }
   }
 }
 </script>
@@ -197,7 +214,10 @@ body
 .player
   position relative
   background-color #ffffff
-  // background-image url('../assets/episodes/ep-3.jpg')
+  background-size 80% 100%
+  background-position center
+  background-repeat no-repeat
+  background-color #34495e
   width 550px
   height 375px
   border-radius 3px
