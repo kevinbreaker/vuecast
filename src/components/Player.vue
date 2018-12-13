@@ -6,7 +6,7 @@
           <img src="../assets/fav-outline.svg" alt srcset>
         </div>
         <div class="mask"></div>
-        <ul class="player-info info-one" style="text-align: left; padding-left: 10px">
+        <ul v-show="!played" class="player-info info-one" style="text-align: left; padding-left: 10px">
           <li>
             <strong>VueCast</strong>
           </li>
@@ -21,14 +21,14 @@
             <span id="duration"></span>
           </li>
         </ul>
-        <div @click="play" id="play-button" :class="played ? 'play-inactive' : 'unchecked'" style="display: flex; align-items: center; justify-content: center">
+        <div v-show="!played" @click="play" id="play-button" :class="played ? 'play-inactive' : 'unchecked'" style="display: flex; align-items: center; justify-content: center">
           <img style="height: 50px" src="../assets/play.svg" alt srcset>
         </div>
         <div class="control-row">
-          <div class="waves-animation-one"></div>
-          <div class="waves-animation-two"></div>
-          <div id="pause-button" :class="played ? 'scale-animation-active' : ''">
-            <img src="../assets/pause-circle.svg" alt>
+          <div v-show="played" class="waves-animation-one"></div>
+          <div v-show="!played" class="waves-animation-two"></div>
+          <div @click="pause" v-show="played" id="pause-button" :class="played ? 'scale-animation-active' : ''">
+            <img style="width: 100%" src="../assets/pause-outline.svg" alt>
           </div>
           <div class="seek-field">
             <input
@@ -58,7 +58,7 @@
         </div>
       </div>
     </div>
-    <audio ref="player" id="audio-player" ontimeupdate="SeekBar()" ondurationchange="CreateSeekBar()" preload="auto" loop>
+    <audio ref="player" id="audio-player" ontimeupdate="SeekBar()" ondurationchange="CreateSeekBar" preload="auto" loop>
       <source src="../assets/episodes/003-arquitetura-e-estruturcao-de-projetos.mp3" type="audio/mpeg">
     </audio>
   </div>
@@ -184,16 +184,19 @@ export default {
     this.$nextTick(() => {
       console.log(this.$refs.player.duration, 'hehe')
     })
-    // this.$refs.player.duration
   },
   methods: {
     volume (value) {
-      console.log(value)
-      this.$refs.player.volume = value / 100
+      console.log(value.target.value)
+      document.getElementById('audio-player').volume = value.target.value / 100
     },
     play () {
       this.played = !this.played
-      // document.getElementById('audio-player').play()
+      document.getElementById('audio-player').play()
+    },
+    pause () {
+      this.played = !this.played
+      document.getElementById('audio-player').pause()
     }
   }
 }
@@ -214,8 +217,8 @@ body
 .player
   position relative
   background-color #ffffff
-  background-size 80% 100%
-  background-position center
+  background-size 50% 70%
+  // background-position center
   background-repeat no-repeat
   background-color #34495e
   width 550px
@@ -347,27 +350,27 @@ body
 
   & #pause-button
     box-sizing border-box
+    display flex
+    justify-content center
+    align-items center
     position absolute
     width 80px
     height 80px
     border-radius 50%
-    background-color #f2f2f2
+    background-color transparent
     left 40px
     bottom 25px
     z-index 5
     cursor pointer
     border none
     transform scale(0)
-    display none
     animation scale-animation 0.4s
     animation-fill-mode forwards
     animation-delay 0.3s
 
     & .icon-pause
       position absolute
-      font-size 1.5em
-      left 50%
-      top 50%
+      width 80px
       transform translate(-50%, -50%)
       transition all 0.1s
       color #424242
@@ -400,7 +403,7 @@ body
     width 50px
     z-index 5
     transform scale(0)
-    display none
+    // display none
     animation scale-animation 0.4s
     animation-fill-mode forwards
     animation-delay 0.3s
@@ -414,7 +417,7 @@ body
     right 185px
     z-index 5
     font-size 1.2em
-    display none
+    // display none
     transform scale(0)
     animation scale-animation 0.4s
     animation-fill-mode forwards
@@ -444,14 +447,14 @@ body
   height 80px
   border-radius 50%
   background-color #5c6bc0
-  z-index 3
+  // z-index 2
   left 42.5%
   bottom 20%
   transform scale(0)
   animation waves-animation-one 0.25s
   animation-fill-mode forwards
   animation-delay 0.3s
-  display none
+  // display none
 
 @keyframes waves-animation-one
   0%
@@ -473,7 +476,7 @@ body
   right 40px
   bottom 35px
   transform scale(7.8)
-  display none
+  // display none
   animation waves-animation-two 0.2s
   animation-fill-mode forwards
 
