@@ -42,10 +42,10 @@
               onchange="this.oninput()"
             >
           </div>
-          <div class="volume-icon">
-            <i class="icon-volume-up"></i>
+          <div v-show="played" class="volume-icon">
+            <img :src="volumeImg" alt="" srcset="">
           </div>
-          <div class="volume-field">
+          <div v-show="played" class="volume-field">
             <input
               type="range"
               min="0"
@@ -58,7 +58,7 @@
         </div>
       </div>
     </div>
-    <audio ref="player" id="audio-player" ontimeupdate="SeekBar()" ondurationchange="CreateSeekBar" preload="auto" loop>
+    <audio ref="player" id="audio-player" ontimeupdate="seekBar()" ondurationchange="seekBar()" preload="auto" loop>
       <source src="../assets/episodes/003-arquitetura-e-estruturcao-de-projetos.mp3" type="audio/mpeg">
     </audio>
   </div>
@@ -178,25 +178,43 @@ export default {
   },
   data: () => ({
     played: false,
-    time: '00:00'
+    time: '00:00',
+    vol: '1'
   }),
   mounted () {
     this.$nextTick(() => {
       console.log(this.$refs.player.duration, 'hehe')
     })
   },
+  computed: {
+    volumeImg () {
+      if (this.vol >= 0.7) return require('../../public/volume.svg')
+      else if (this.vol < 0.7 && this.vol > 0) return require('../../public/volume_less.svg')
+      else return require('../../public/muted.svg')
+    }
+  },
+  watch: {
+    '$refs.player' (v) {
+      console.log(v)
+      this.vol = v
+    }
+  },
   methods: {
     volume (value) {
-      console.log(value.target.value)
+      this.vol = value.target.value / 100
       document.getElementById('audio-player').volume = value.target.value / 100
+    },
+    seekBar (d) {
+      console.log(' idj ')
+      console.log(d)
     },
     play () {
       this.played = !this.played
-      document.getElementById('audio-player').play()
+      this.$refs.player.play()
     },
     pause () {
       this.played = !this.played
-      document.getElementById('audio-player').pause()
+      this.$refs.player.pause()
     }
   }
 }
@@ -210,9 +228,9 @@ body
   position absolute
   width 100%
   height 100%
-  display flex
-  align-items center
-  justify-content center
+  // display flex
+  // align-items center
+  // justify-content center
 
 .player
   position relative
@@ -526,6 +544,7 @@ input[type='range']
   width 100%
   position absolute
   top 50%
+  background transparent
   transform translateY(-50%)
 
 input[type='range']:focus
