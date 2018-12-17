@@ -3,49 +3,50 @@
     <div class="container">
       <div class="player" :style="{backgroundImage: `url(${image})`}">
         <div class="like waves-effect waves-light">
-          <img src="../assets/fav-outline.svg" alt srcset>
+          <img src="../assets/info.svg" alt srcset>
         </div>
         <div class="mask"></div>
-        <ul v-show="!played" class="player-info info-one" style="text-align: left; padding-left: 10px">
+        <ul v-show="!active" class="player-info info-one" style="text-align: left; padding-left: 10px">
           <li>
             <strong>VueCast</strong>
           </li>
           <li>{{title}}</li>
           <li>{{host}}</li>
-          <li>{{time}}</li>
+          <li>{{timing}}</li>
         </ul>
-        <ul class="player-info info-two" :class="played ? 'info-active' : ''">
+        <ul class="player-info info-two" :class="active ? 'info-active' : ''">
           <li>{{title}}</li>
           <li>{{host}}</li>
           <li>
             <span id="duration"></span>
+              {{timing}}/ {{leftTiming}}
           </li>
         </ul>
-        <div v-show="!played" @click="play" id="play-button" :class="played ? 'play-inactive' : 'unchecked'" style="display: flex; align-items: center; justify-content: center">
+        <div v-show="!active" @click="togglePlay" id="play-button" :class="active ? 'play-inactive' : 'unchecked'" style="display: flex; align-items: center; justify-content: center">
           <img style="height: 50px" src="../assets/play.svg" alt srcset>
         </div>
         <div class="control-row">
-          <div v-show="played" class="waves-animation-one"></div>
-          <div v-show="!played" class="waves-animation-two"></div>
-          <div @click="pause" v-show="played" id="pause-button" :class="played ? 'scale-animation-active' : ''">
-            <img style="width: 100%" src="../assets/pause-outline.svg" alt>
+          <div v-show="active" class="waves-animation-one"></div>
+          <div v-show="!active" class="waves-animation-two"></div>
+          <div @click="togglePlay" v-show="active" id="pause-button" :class="active ? 'scale-animation-active' : ''">
+            <img style="width: 100%" :src="buttonPlay" alt>
           </div>
-          <div class="seek-field">
+          <div v-show="active" class="seek-field">
             <input
               id="audioSeekBar"
               min="0"
-              max="334"
+              :max="durationTime"
               step="1"
-              value="0"
+              :value="currentTime"
               type="range"
-              oninput="audioSeekBar()"
-              onchange="this.oninput()"
+              @input="audioSeekBar"
+              @change="seekB"
             >
           </div>
-          <div v-show="played" class="volume-icon">
+          <div v-show="active" class="volume-icon">
             <img :src="volumeImg" alt="" srcset="">
           </div>
-          <div v-show="played" class="volume-field">
+          <div v-show="active" class="volume-field">
             <input
               type="range"
               min="0"
@@ -55,121 +56,17 @@
               @change="volume"
             >
           </div>
+          <div class="close" @click="close"><img src="../assets/close.svg" alt=""></div>
         </div>
       </div>
     </div>
-    <audio ref="player" id="audio-player" ontimeupdate="seekBar()" ondurationchange="seekBar()" preload="auto" loop>
+    <audio ref="player" id="audio-player" @timeupdate="seekBar" @durationchange="duration" preload="auto" loop>
       <source src="../assets/episodes/003-arquitetura-e-estruturcao-de-projetos.mp3" type="audio/mpeg">
     </audio>
   </div>
 </template>
 
 <script>
-// var audio = document.getElementById("audio-player");
-
-// $(document).ready(function() {
-//   $("#play-button").click(function() {
-//     if ($(this).hasClass("unchecked")) {
-//       $(this)
-//         .addClass("play-active")
-//         .removeClass("play-inactive")
-//         .removeClass("unchecked");
-//       $(".info-two").addClass("info-active");
-//       $("#pause-button").addClass("scale-animation-active");
-//       $(
-//         ".waves-animation-one, #pause-button, .seek-field, .volume-icon, .volume-field, .info-two"
-//       ).show();
-//       $(".waves-animation-two").hide();
-//       $("#pause-button")
-//         .children(".icon")
-//         .addClass("icon-pause")
-//         .removeClass("icon-play");
-//       setTimeout(function() {
-//         $(".info-one").hide();
-//       }, 400);
-//       audio.play();
-//       audio.currentTime = 0;
-//     } else {
-//       $(this)
-//         .removeClass("play-active")
-//         .addClass("play-inactive")
-//         .addClass("unchecked");
-//       $("#pause-button")
-//         .children(".icon")
-//         .addClass("icon-pause")
-//         .removeClass("icon-play");
-//       $(".info-two").removeClass("info-active");
-//       $(
-//         ".waves-animation-one, #pause-button, .seek-field, .volume-icon, .volume-field, .info-two"
-//       ).hide();
-//       $(".waves-animation-two").show();
-//       setTimeout(function() {
-//         $(".info-one").show();
-//       }, 150);
-//       audio.pause();
-//       audio.currentTime = 0;
-//     }
-//   });
-//   $("#pause-button").click(function() {
-//     $(this)
-//       .children(".icon")
-//       .toggleClass("icon-pause")
-//       .toggleClass("icon-play");
-
-//     if (audio.paused) {
-//       audio.play();
-//     } else {
-//       audio.pause();
-//     }
-//   });
-//   $("#play-button").click(function() {
-//     setTimeout(function() {
-//       $("#play-button")
-//         .children(".icon")
-//         .toggleClass("icon-play")
-//         .toggleClass("icon-cancel");
-//     }, 350);
-//   });
-//   $(".like").click(function() {
-//     $(".icon-heart").toggleClass("like-active");
-//   });
-// });
-
-// function CreateSeekBar() {
-//   var seekbar = document.getElementById("audioSeekBar");
-//   seekbar.min = 0;
-//   seekbar.max = audio.duration;
-//   seekbar.value = 0;
-// }
-
-// function EndofAudio() {
-//   document.getElementById("audioSeekBar").value = 0;
-// }
-
-// function audioSeekBar() {
-//   var seekbar = document.getElementById("audioSeekBar");
-//   audio.currentTime = seekbar.value;
-// }
-
-// function SeekBar() {
-//   var seekbar = document.getElementById("audioSeekBar");
-//   seekbar.value = audio.currentTime;
-// }
-
-// audio.addEventListener(
-//   "timeupdate",
-//   function() {
-//     var duration = document.getElementById("duration");
-//     var s = parseInt(audio.currentTime % 60);
-//     var m = parseInt((audio.currentTime / 60) % 60);
-//     duration.innerHTML = m + ":" + s;
-//   },
-//   false
-// );
-
-// Waves.init();
-// Waves.attach("#play-button", ["waves-button", "waves-float"]);
-// Waves.attach("#pause-button", ["waves-button", "waves-float"]);
 export default {
   props: {
     title: String,
@@ -177,9 +74,12 @@ export default {
     host: String
   },
   data: () => ({
+    active: false,
     played: false,
     time: '00:00',
-    vol: '1'
+    currentTime: '',
+    durationTime: 0,
+    vol: 1
   }),
   mounted () {
     this.$nextTick(() => {
@@ -188,9 +88,24 @@ export default {
   },
   computed: {
     volumeImg () {
-      if (this.vol >= 0.7) return require('../../public/volume.svg')
-      else if (this.vol < 0.7 && this.vol > 0) return require('../../public/volume_less.svg')
-      else return require('../../public/muted.svg')
+      if (this.vol >= 0.7) return require('../assets/volume.svg')
+      else if (this.vol < 0.7 && this.vol > 0) return require('../assets/volume_less.svg')
+      else return require('../assets/muted.svg')
+    },
+    buttonPlay () {
+      return this.played
+        ? require('../assets/pause-outline.svg')
+        : require('../assets/play-circle.svg')
+    },
+    timing () {
+      const timeLeft = this.timingLeft(this.durationTime * 1000)
+      return `${timeLeft.hours}:${timeLeft.minutes}:${timeLeft.seconds}`
+    },
+    leftTiming () {
+      console.log(' .-. pqp man')
+      const timeLeft = this.timingLeft(this.currentTime * 1000)
+      console.log(`${timeLeft.hours}:${timeLeft.minutes}:${timeLeft.seconds}`)
+      return `${timeLeft.hours}:${timeLeft.minutes}:${timeLeft.seconds}`
     }
   },
   watch: {
@@ -200,21 +115,55 @@ export default {
     }
   },
   methods: {
+    close () {
+      this.active = false
+      this.played = false
+      this.$refs.player.pause()
+    },
     volume (value) {
       this.vol = value.target.value / 100
       document.getElementById('audio-player').volume = value.target.value / 100
     },
+    duration (e) {
+      console.log('muda muda')
+      console.log(e.target.duration)
+      this.durationTime = e.target.duration
+    },
+    audioSeekBar (x) {
+      console.log(' SEEK ', x.target.value)
+    },
+    seekB (e) {
+      console.log('eirjweoir')
+      console.log(e.target.value)
+      this.$refs.player.currentTime = e.target.value
+    },
     seekBar (d) {
-      console.log(' idj ')
-      console.log(d)
+      console.log(' seekBar muda muda ')
+      console.log(d.target.currentTime)
+      this.currentTime = d.target.currentTime
     },
-    play () {
+    togglePlay () {
+      this.active
+        ? this.active = true
+        : this.active = true
       this.played = !this.played
-      this.$refs.player.play()
+      this.played
+        ? this.$refs.player.play()
+        : this.$refs.player.pause()
     },
-    pause () {
-      this.played = !this.played
-      this.$refs.player.pause()
+    calculateTiming (val, step, overflow) {
+      return overflow
+        ? ~~(Math.floor(val / step) % overflow)
+        : Math.floor(val / step)
+    },
+    timingLeft (ms) {
+      console.log('Executei')
+      return {
+        milliseconds: this.calculateTiming(ms, 1, 1000),
+        seconds: this.calculateTiming(ms, 1000, 60),
+        minutes: this.calculateTiming(ms, 60000, 60),
+        hours: this.calculateTiming(ms, 3600000, 24)
+      }
     }
   }
 }
@@ -298,17 +247,17 @@ body
 
   & .info-two
     left auto
+    width 250px
     right 4.5%
     z-index 1
     color #f2f2f2
-
+    & li:nth-child(1)
+      text-align end
     & li:nth-child(2)
-      float right
+      text-align end
 
     & li:nth-child(3)
-      display inline-block
-      float right
-      clear both
+      text-align end
 
   & #play-button
     box-sizing border-box
@@ -349,13 +298,14 @@ body
       font-size 1.2em
       transition all 70ms
 
-    & .icon-cancel
-      position absolute
-      font-size 1.6em
-      left 50%
-      top 49%
-      transform translate(-50%, -51%)
-      color #ffffff
+  & .close
+    bottom 50px
+    right 40px
+    position absolute
+    z-index 5
+
+    &:hover
+      cursor pointer
 
 .control-row
   position absolute
@@ -404,12 +354,11 @@ body
 
   & .seek-field
     bottom 67px
-    left 148px
+    left 95px
     position absolute
     width 170px
     z-index 5
     transform scale(0)
-    display none
     animation scale-animation 0.4s
     animation-fill-mode forwards
     animation-delay 0.3s
@@ -417,6 +366,7 @@ body
   & .volume-field
     bottom 67px
     right 127px
+    outline none
     position absolute
     width 50px
     z-index 5
@@ -432,7 +382,7 @@ body
     position absolute
     border-radius 50%
     bottom 58px
-    right 185px
+    right 160px
     z-index 5
     font-size 1.2em
     // display none
